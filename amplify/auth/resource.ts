@@ -1,4 +1,4 @@
-import { defineAuth } from '@aws-amplify/backend'
+import { defineAuth } from "@aws-amplify/backend"
 
 // Define authentication configuration
 export const auth = defineAuth({
@@ -6,5 +6,4 @@ export const auth = defineAuth({
     email: true,
     // Add additional authentication methods as needed
   },
-  verificationType: 'code',
 })
