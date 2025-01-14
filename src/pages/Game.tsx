@@ -1,61 +1,70 @@
-import { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
-import { useNavigate } from 'react-router-dom';
-import { Home, RotateCw, CreditCard, DollarSign } from 'lucide-react';
-import { useGameStore } from '../store/gameStore';
-import { PlayerHand } from '../components/PlayerHand';
-import { CardPlayModal } from '../components/CardPlayModal';
-import { Card } from '../components/Card';
-import { PropertyColor } from '../types/game';
-import { getCardById } from '../lib/cards';
+import { useState, useEffect } from "react"
+import { motion } from "framer-motion"
+import { useNavigate } from "react-router-dom"
+import { Home, RotateCw, CreditCard, DollarSign } from "lucide-react"
+import { useGameStore } from "../store/gameStore"
+import { PlayerHand } from "../components/PlayerHand"
+import { CardPlayModal } from "../components/CardPlayModal"
+import { Card } from "../components/Card"
+import { PropertyColor } from "../types/game"
+import { getCardById } from "../lib/cards"
 
 export function Game() {
-  const navigate = useNavigate();
-  const [selectedCardId, setSelectedCardId] = useState<string | null>(null);
-  const { 
-    players, 
-    currentPlayer, 
-    drawCard, 
+  const navigate = useNavigate()
+  const [selectedCardId, setSelectedCardId] = useState<string | null>(null)
+  const {
+    players,
+    currentPlayer,
+    drawCard,
     playCard,
     discardCard,
     endTurn,
     winner,
     deck,
-    discardPile,
-    cardsPlayedThisTurn
-  } = useGameStore();
+    cardsPlayedThisTurn,
+  } = useGameStore()
 
   useEffect(() => {
     if (!players || players.length === 0) {
-      navigate('/');
-      return;
+      navigate("/")
+      return
     }
-  }, [players, navigate]);
+  }, [players, navigate])
 
   if (!players || players.length === 0) {
-    return null;
+    return null
   }
 
   const handlePlayCard = (cardId: string) => {
     if (cardsPlayedThisTurn >= 3) {
-      return; // Don't allow more than 3 card plays per turn
+      return // Don't allow more than 3 card plays per turn
     }
-    setSelectedCardId(cardId);
-  };
+    setSelectedCardId(cardId)
+  }
 
-  const handleCardAction = (targetPlayerId?: string, selectedColor?: PropertyColor, targetPropertyId?: string) => {
+  const handleCardAction = (
+    targetPlayerId?: string,
+    selectedColor?: PropertyColor,
+    targetPropertyId?: string
+  ) => {
     if (selectedCardId && players[currentPlayer]) {
-      playCard(players[currentPlayer].id, selectedCardId, targetPlayerId, selectedColor, targetPropertyId);
-      setSelectedCardId(null);
+      playCard(
+        players[currentPlayer].id,
+        selectedCardId,
+        targetPlayerId,
+        selectedColor,
+        targetPropertyId
+      )
+      setSelectedCardId(null)
     }
-  };
+  }
 
   const handleDiscardCard = () => {
     if (selectedCardId && players[currentPlayer]) {
-      discardCard(players[currentPlayer].id, selectedCardId);
-      setSelectedCardId(null);
+      discardCard(players[currentPlayer].id, selectedCardId)
+      setSelectedCardId(null)
     }
-  };
+  }
 
   if (winner) {
     return (
@@ -66,22 +75,22 @@ export function Game() {
           className="bg-white rounded-lg p-8 text-center"
         >
           <h2 className="text-2xl font-bold mb-4">
-            {players.find(p => p.id === winner)?.name} Wins!
+            {players.find((p) => p.id === winner)?.name} Wins!
           </h2>
           <button
-            onClick={() => navigate('/')}
+            onClick={() => navigate("/")}
             className="bg-purple-600 text-white px-6 py-2 rounded-lg"
           >
             Back to Home
           </button>
         </motion.div>
       </div>
-    );
+    )
   }
 
-  const currentPlayerData = players[currentPlayer];
+  const currentPlayerData = players[currentPlayer]
   if (!currentPlayerData) {
-    return null;
+    return null
   }
 
   return (
@@ -91,7 +100,7 @@ export function Game() {
         <motion.button
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
-          onClick={() => navigate('/')}
+          onClick={() => navigate("/")}
           className="text-white flex items-center gap-2 hover:text-gray-200"
         >
           <Home size={20} />
@@ -140,8 +149,8 @@ export function Game() {
                 transition={{ delay: index * 0.1 }}
                 className={`p-4 rounded-lg ${
                   currentPlayer === index
-                    ? 'bg-white/20 ring-2 ring-white/50'
-                    : 'bg-black/20'
+                    ? "bg-white/20 ring-2 ring-white/50"
+                    : "bg-black/20"
                 }`}
               >
                 <div className="flex justify-between items-center mb-4">
@@ -159,9 +168,9 @@ export function Game() {
                 </div>
                 <div className="grid grid-cols-3 gap-2">
                   {player.properties.map((propertySet, setIndex) => {
-                    if (propertySet.length === 0) return null;
-                    const firstCard = getCardById(propertySet[0]);
-                    if (!firstCard) return null;
+                    if (propertySet.length === 0) return null
+                    const firstCard = getCardById(propertySet[0])
+                    if (!firstCard) return null
 
                     return (
                       <motion.div
@@ -179,16 +188,16 @@ export function Game() {
                             className="absolute"
                             style={{
                               top: `${propertyIndex * 8}px`,
-                              left: '50%',
-                              transform: 'translateX(-50%)',
-                              zIndex: propertyIndex
+                              left: "50%",
+                              transform: "translateX(-50%)",
+                              zIndex: propertyIndex,
                             }}
                           >
                             <Card cardId={cardId} miniature={true} />
                           </motion.div>
                         ))}
                       </motion.div>
-                    );
+                    )
                   })}
                 </div>
               </motion.div>
@@ -220,7 +229,7 @@ export function Game() {
       {selectedCardId && (
         <CardPlayModal
           cardId={selectedCardId}
-          playerIds={players.map(p => p.id)}
+          playerIds={players.map((p) => p.id)}
           onClose={() => setSelectedCardId(null)}
           onAction={handleCardAction}
           onDiscard={handleDiscardCard}
@@ -228,5 +237,5 @@ export function Game() {
         />
       )}
     </div>
-  );
+  )
 }

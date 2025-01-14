@@ -1,5 +1,4 @@
 import { motion } from "framer-motion"
-import { Card as CardType } from "../types/game"
 import { PROPERTY_COLORS } from "../lib/cards"
 import { cn } from "../lib/utils"
 import { DollarSign, Zap } from "lucide-react"

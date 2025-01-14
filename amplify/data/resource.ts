@@ -1,7 +1,8 @@
 import { a, defineData, type ClientSchema } from "@aws-amplify/backend"
 
 const schema = a.schema({
-  Player: a.model({
+  Player: a
+    .model({
       id: a.string().required(),
       username: a.string().required(),
       email: a.string().required(),
@@ -10,7 +11,7 @@ const schema = a.schema({
       gamesWon: a.integer(),
       currentGameId: a.string(),
     })
-    .authorization((allow) => [allow.publicApiKey()]),
+    .authorization((allow) => [allow.owner()]),
 
   Game: a
     .model({
@@ -55,7 +56,7 @@ export type Schema = ClientSchema<typeof schema>
 export const data = defineData({
   schema,
   authorizationModes: {
-    defaultAuthorizationMode: "apiKey",
+    defaultAuthorizationMode: "userPool",
     apiKeyAuthorizationMode: {
       expiresInDays: 30,
     },
