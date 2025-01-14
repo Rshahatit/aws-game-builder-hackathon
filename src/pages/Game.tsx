@@ -1,15 +1,22 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { Home, RotateCw, CreditCard, DollarSign } from 'lucide-react';
 import { useGameStore } from '../store/gameStore';
+import { useGameSubscriptions } from '../hooks/useGameSubscriptions';
 import { PlayerHand } from '../components/PlayerHand';
 import { CardPlayModal } from '../components/CardPlayModal';
 import { Card } from '../components/Card';
 import { Card as CardType, PropertyColor } from '../types/game';
+import { generateClient } from "@aws-amplify/api"
+import type { Schema } from "../../amplify/data/resource"
+import { getCardById } from '../lib/cards'
+
+const client = generateClient<Schema>();
 
 export function Game() {
   const navigate = useNavigate();
+  const { gameId } = useParams(); // Add this to get the game ID from URL
   const [selectedCard, setSelectedCard] = useState<CardType | null>(null);
   const { 
     players, 
@@ -19,19 +26,64 @@ export function Game() {
     endTurn,
     winner,
     deck,
-    discardPile 
+    initializeGame 
   } = useGameStore();
 
+  // Use the subscription hook
+  useGameSubscriptions(gameId || '');
+
   useEffect(() => {
-    if (!players || players.length === 0) {
+    if (!gameId) {
       navigate('/');
       return;
     }
-  }, [players, navigate]);
 
-  if (!players || players.length === 0) {
-    return null;
-  }
+    // Initial game state fetch
+    const fetchGameState = async () => {
+      try {
+        const game = await client.models.Game.get({
+          id: gameId
+        });
+        
+        if (!game) {
+          navigate('/');
+          return;
+        }
+
+        const playerStates = await client.models.PlayerGameState.list({
+          filter: { gameId: { eq: gameId } }
+        });
+
+        // Initialize game state with fetched data
+        if (game && playerStates.data) {
+          const playerData = playerStates.data.map(state => ({
+            id: state.playerId,
+            hand: state.hand,
+            properties: state.properties,
+            bank: state.bank,
+            name: '' // You'll need to fetch player names separately
+          }));
+
+          initializeGame(playerData.map(p => p.name));
+          
+          const newDeck = game.data?.deck?.filter((cardId): cardId is string => cardId !== null).map(cardId => getCardById(cardId))
+          const newDiscardPile = game.data?.discardPile?.filter((cardId): cardId is string => cardId !== null).map(cardId => getCardById(cardId))
+          // Update the store with the current game state
+          useGameStore.setState({
+            currentPlayer: game.data?.currentPlayerIndex ?? 0,
+            deck: newDeck,
+            discardPile: newDiscardPile,
+            winner: game?.data?.winner || '',
+          });
+        }
+      } catch (error) {
+        console.error('Error fetching game state:', error);
+        navigate('/');
+      }
+    };
+
+    fetchGameState();
+  }, [gameId, navigate]);
 
   const handlePlayCard = (card: CardType) => {
     setSelectedCard(card);
