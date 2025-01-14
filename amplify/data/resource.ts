@@ -24,7 +24,6 @@ const schema = a.schema({
       winner: a.string(),
       discardPile: a.string().array().required(), // Array of card IDs
       deck: a.string().array().required(), // Array of card IDs
-      currentPlayerIndex: a.integer().required(),
     })
     .authorization((allow) => [allow.publicApiKey()]),
 
@@ -34,10 +33,9 @@ const schema = a.schema({
       playerId: a.string().required(),
       gameId: a.string().required(),
       hand: a.string().array().required(), // Array of card IDs
-      properties: a.string().array().required(), // Array of property card IDs
-      bank: a.string().array().required(), // Array of money/action card IDs
+      properties: a.string().array().required(), // Array of card IDs
+      bank: a.string().array().required(), // Array of card IDs
       isCreator: a.boolean(),
-      isActive: a.boolean().required(),
     })
     .authorization((allow) => [allow.publicApiKey()]),
 
@@ -50,7 +48,6 @@ const schema = a.schema({
       cardIds: a.string().array().required(),
       timestamp: a.datetime().required(),
       targetPlayerId: a.string(),
-      targetPropertyId: a.string(),
     })
     .authorization((allow) => [allow.publicApiKey()]),
 })
