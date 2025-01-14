@@ -1,14 +1,14 @@
 import { motion } from 'framer-motion';
 import { Card } from './Card';
-import { Card as CardType } from '../types/game';
 
 interface PlayerHandProps {
-  cards: CardType[];
-  onPlayCard: (card: CardType) => void;
+  cardIds: string[];
+  onPlayCard: (cardId: string) => void;
+  disabled?: boolean;
 }
 
-export const PlayerHand = ({ cards, onPlayCard }: PlayerHandProps) => {
-  if (!cards || cards.length === 0) {
+export const PlayerHand = ({ cardIds, onPlayCard, disabled = false }: PlayerHandProps) => {
+  if (!cardIds || cardIds.length === 0) {
     return null;
   }
 
@@ -19,17 +19,18 @@ export const PlayerHand = ({ cards, onPlayCard }: PlayerHandProps) => {
       animate={{ y: 0 }}
     >
       <div className="flex gap-2 min-w-max px-4 mx-auto max-w-[90vw]">
-        {cards.map((card, index) => (
+        {cardIds.map((cardId, index) => (
           <motion.div
-            key={`${card.id}-${index}`}
+            key={`${cardId}-${index}`}
             initial={{ x: -100, opacity: 0 }}
             animate={{ x: 0, opacity: 1 }}
             transition={{ delay: index * 0.1 }}
             style={{ zIndex: index }}
+            className={disabled ? 'opacity-50' : ''}
           >
             <Card
-              card={card}
-              onClick={() => onPlayCard(card)}
+              cardId={cardId}
+              onClick={disabled ? undefined : () => onPlayCard(cardId)}
               className="hover:-translate-y-4 transition-transform"
             />
           </motion.div>

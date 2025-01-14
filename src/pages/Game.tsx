@@ -1,98 +1,59 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { Home, RotateCw, CreditCard, DollarSign } from 'lucide-react';
 import { useGameStore } from '../store/gameStore';
-import { useGameSubscriptions } from '../hooks/useGameSubscriptions';
 import { PlayerHand } from '../components/PlayerHand';
 import { CardPlayModal } from '../components/CardPlayModal';
 import { Card } from '../components/Card';
-import { Card as CardType, PropertyColor } from '../types/game';
-import { generateClient } from "@aws-amplify/api"
-import type { Schema } from "../../amplify/data/resource"
-import { getCardById } from '../lib/cards'
-
-const client = generateClient<Schema>();
+import { PropertyColor } from '../types/game';
+import { getCardById } from '../lib/cards';
 
 export function Game() {
   const navigate = useNavigate();
-  const { gameId } = useParams(); // Add this to get the game ID from URL
-  const [selectedCard, setSelectedCard] = useState<CardType | null>(null);
+  const [selectedCardId, setSelectedCardId] = useState<string | null>(null);
   const { 
     players, 
     currentPlayer, 
     drawCard, 
-    playCard, 
+    playCard,
+    discardCard,
     endTurn,
     winner,
     deck,
-    initializeGame 
+    discardPile,
+    cardsPlayedThisTurn
   } = useGameStore();
 
-  // Use the subscription hook
-  useGameSubscriptions(gameId || '');
-
   useEffect(() => {
-    if (!gameId) {
+    if (!players || players.length === 0) {
       navigate('/');
       return;
     }
+  }, [players, navigate]);
 
-    // Initial game state fetch
-    const fetchGameState = async () => {
-      try {
-        const game = await client.models.Game.get({
-          id: gameId
-        });
-        
-        if (!game) {
-          navigate('/');
-          return;
-        }
+  if (!players || players.length === 0) {
+    return null;
+  }
 
-        const playerStates = await client.models.PlayerGameState.list({
-          filter: { gameId: { eq: gameId } }
-        });
-
-        // Initialize game state with fetched data
-        if (game && playerStates.data) {
-          const playerData = playerStates.data.map(state => ({
-            id: state.playerId,
-            hand: state.hand,
-            properties: state.properties,
-            bank: state.bank,
-            name: '' // You'll need to fetch player names separately
-          }));
-
-          initializeGame(playerData.map(p => p.name));
-          
-          const newDeck = game.data?.deck?.filter((cardId): cardId is string => cardId !== null).map(cardId => getCardById(cardId))
-          const newDiscardPile = game.data?.discardPile?.filter((cardId): cardId is string => cardId !== null).map(cardId => getCardById(cardId))
-          // Update the store with the current game state
-          useGameStore.setState({
-            currentPlayer: game.data?.currentPlayerIndex ?? 0,
-            deck: newDeck,
-            discardPile: newDiscardPile,
-            winner: game?.data?.winner || '',
-          });
-        }
-      } catch (error) {
-        console.error('Error fetching game state:', error);
-        navigate('/');
-      }
-    };
-
-    fetchGameState();
-  }, [gameId, navigate]);
-
-  const handlePlayCard = (card: CardType) => {
-    setSelectedCard(card);
+  const handlePlayCard = (cardId: string) => {
+    if (cardsPlayedThisTurn >= 3) {
+      return; // Don't allow more than 3 card plays per turn
+    }
+    setSelectedCardId(cardId);
   };
 
   const handleCardAction = (targetPlayerId?: string, selectedColor?: PropertyColor, targetPropertyId?: string) => {
-    if (selectedCard && players[currentPlayer]) {
-      playCard(players[currentPlayer].id, selectedCard.id, targetPlayerId, selectedColor, targetPropertyId);
-      setSelectedCard(null);
+    if (selectedCardId && players[currentPlayer]) {
+      playCard(players[currentPlayer].id, selectedCardId, targetPlayerId, selectedColor, targetPropertyId);
+      setSelectedCardId(null);
+    }
+  };
+
+  const handleDiscardCard = () => {
+    if (selectedCardId && players[currentPlayer]) {
+      discardCard(players[currentPlayer].id, selectedCardId);
+      setSelectedCardId(null);
     }
   };
 
@@ -142,6 +103,9 @@ export function Game() {
           </div>
           <div className="bg-white/10 px-3 py-1 rounded-full text-white text-sm">
             Cards in deck: {deck.length}
+          </div>
+          <div className="bg-white/10 px-3 py-1 rounded-full text-white text-sm">
+            Plays left: {Math.max(0, 3 - cardsPlayedThisTurn)}
           </div>
         </div>
         <motion.button
@@ -194,39 +158,44 @@ export function Game() {
                   </div>
                 </div>
                 <div className="grid grid-cols-3 gap-2">
-                  {player.properties.map((propertySet, setIndex) => (
-                    <motion.div
-                      key={setIndex}
-                      initial={{ scale: 0.8 }}
-                      animate={{ scale: 1 }}
-                      className="min-h-[120px] rounded bg-white/5 p-2 flex flex-col gap-1"
-                    >
-                      {propertySet.map((property, propertyIndex) => (
-                        <motion.div
-                          key={property.id}
-                          initial={{ y: -20, opacity: 0 }}
-                          animate={{ y: 0, opacity: 1 }}
-                          transition={{ delay: propertyIndex * 0.1 }}
-                        >
-                          <Card card={property} miniature={true} />
-                        </motion.div>
-                      ))}
-                    </motion.div>
-                  ))}
+                  {player.properties.map((propertySet, setIndex) => {
+                    if (propertySet.length === 0) return null;
+                    const firstCard = getCardById(propertySet[0]);
+                    if (!firstCard) return null;
+
+                    return (
+                      <motion.div
+                        key={setIndex}
+                        initial={{ scale: 0.8 }}
+                        animate={{ scale: 1 }}
+                        className="relative min-h-[120px] rounded bg-white/5 p-2"
+                      >
+                        {propertySet.map((cardId, propertyIndex) => (
+                          <motion.div
+                            key={cardId}
+                            initial={{ y: -20, opacity: 0 }}
+                            animate={{ y: 0, opacity: 1 }}
+                            transition={{ delay: propertyIndex * 0.1 }}
+                            className="absolute"
+                            style={{
+                              top: `${propertyIndex * 8}px`,
+                              left: '50%',
+                              transform: 'translateX(-50%)',
+                              zIndex: propertyIndex
+                            }}
+                          >
+                            <Card cardId={cardId} miniature={true} />
+                          </motion.div>
+                        ))}
+                      </motion.div>
+                    );
+                  })}
                 </div>
               </motion.div>
             ))}
           </div>
         </motion.div>
       </div>
-
-      {/* Player Hand */}
-      {currentPlayerData.hand && (
-        <PlayerHand
-          cards={currentPlayerData.hand}
-          onPlayCard={handlePlayCard}
-        />
-      )}
 
       {/* Draw Card Button */}
       <motion.button
@@ -238,13 +207,24 @@ export function Game() {
         Draw Card
       </motion.button>
 
+      {/* Player Hand */}
+      {currentPlayerData.hand && (
+        <PlayerHand
+          cardIds={currentPlayerData.hand}
+          onPlayCard={handlePlayCard}
+          disabled={cardsPlayedThisTurn >= 3}
+        />
+      )}
+
       {/* Card Play Modal */}
-      {selectedCard && (
+      {selectedCardId && (
         <CardPlayModal
-          card={selectedCard}
-          players={players}
-          onClose={() => setSelectedCard(null)}
+          cardId={selectedCardId}
+          playerIds={players.map(p => p.id)}
+          onClose={() => setSelectedCardId(null)}
           onAction={handleCardAction}
+          onDiscard={handleDiscardCard}
+          disabled={cardsPlayedThisTurn >= 3}
         />
       )}
     </div>
