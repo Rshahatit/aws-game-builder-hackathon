@@ -1,4 +1,4 @@
-import { Schema } from "../data/resource"
+import { Schema } from "../../../amplify/data/resource"
 import { generateClient } from "@aws-amplify/api"
 
 // Initialize the AWS Amplify client for database operations
