@@ -126,6 +126,8 @@ export const Card = ({
           )}
           {(card.type === "rent" || card.type === "property_wildcard") &&
             renderColorIndicator()}
+
+          {card.type === "property" && <card.Icon className="text-gray-600" />}
         </div>
 
         <div
