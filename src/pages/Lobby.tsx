@@ -1,33 +1,34 @@
-import { useState } from 'react';
-import { motion } from 'framer-motion';
-import { useNavigate } from 'react-router-dom';
-import { Users, UserPlus, ArrowLeft } from 'lucide-react';
-import { useGameStore } from '../store/gameStore';
+import { useState } from "react"
+import { motion } from "framer-motion"
+import { useNavigate } from "react-router-dom"
+import { Users, UserPlus, ArrowLeft } from "lucide-react"
+import { useGameStore } from "../store/gameStore"
+
 
 export const Lobby = () => {
-  const navigate = useNavigate();
-  const [players, setPlayers] = useState<string[]>(['']);
-  const initializeGame = useGameStore(state => state.initializeGame);
+  const navigate = useNavigate()
+  const [players, setPlayers] = useState<string[]>([""])
+  const initializeGame = useGameStore((state) => state.initializeGame)
 
   const addPlayer = () => {
     if (players.length < 4) {
-      setPlayers([...players, '']);
+      setPlayers([...players, ""])
     }
-  };
+  }
 
-  const updatePlayer = (index: number, name: string) => {
-    const newPlayers = [...players];
-    newPlayers[index] = name;
-    setPlayers(newPlayers);
-  };
+  const updatePlayer = async (index: number, name: string) => {
+    const newPlayers = [...players]
+    newPlayers[index] = name
+    setPlayers(newPlayers)
+  }
 
   const startGame = () => {
-    const validPlayers = players.filter(name => name.trim() !== '');
+    const validPlayers = players.filter((name) => name.trim() !== "")
     if (validPlayers.length >= 2) {
-      initializeGame(validPlayers);
-      navigate('/game');
+      initializeGame(validPlayers)
+      navigate("/game")
     }
-  };
+  }
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center p-4">
@@ -39,7 +40,7 @@ export const Lobby = () => {
         <motion.button
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
-          onClick={() => navigate('/')}
+          onClick={() => navigate("/")}
           className="mb-8 text-white flex items-center gap-2 hover:text-gray-200"
         >
           <ArrowLeft size={20} />
@@ -91,7 +92,7 @@ export const Lobby = () => {
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
               onClick={startGame}
-              disabled={players.filter(name => name.trim() !== '').length < 2}
+              disabled={players.filter((name) => name.trim() !== "").length < 2}
               className="w-full py-2 px-4 bg-purple-600 text-white rounded-md disabled:opacity-50 disabled:cursor-not-allowed hover:bg-purple-700 transition-colors"
             >
               Start Game
@@ -100,7 +101,7 @@ export const Lobby = () => {
         </div>
 
         <div className="mt-4 text-center text-white text-sm">
-          {players.filter(name => name.trim() !== '').length < 2 ? (
+          {players.filter((name) => name.trim() !== "").length < 2 ? (
             <p>Add at least 2 players to start the game</p>
           ) : (
             <p>Ready to start! Click the button above to begin.</p>
@@ -108,5 +109,5 @@ export const Lobby = () => {
         </div>
       </motion.div>
     </div>
-  );
-};
+  )
+}

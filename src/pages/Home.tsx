@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom"
 import { useAuthenticator } from "@aws-amplify/ui-react"
 export const Home = () => {
   const navigate = useNavigate()
-  const { signOut } = useAuthenticator()
+  const { user, signOut } = useAuthenticator()
 
   return (
     <div className="min-h-screen flex items-center justify-center">
@@ -16,6 +16,9 @@ export const Home = () => {
         <h1 className="text-6xl font-bold text-white mb-8">
           Monopoly Deal Online
         </h1>
+
+        <p className="text-white text-xl mb-8">{user.signInDetails?.loginId}</p>
+
         <motion.button
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}

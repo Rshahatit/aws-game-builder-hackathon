@@ -1,17 +1,27 @@
-import { create } from 'zustand';
-import { GameState, Player, PropertyColor } from '../types/game';
-import { createDeck, getCardById } from '../lib/cards';
+import { create } from "zustand"
+import { GameState, PropertyColor } from "../types/game"
+import { createDeck, getCardById } from "../lib/cards"
+import { generateClient } from "aws-amplify/data"
+import type { Schema } from "../../amplify/data/resource" // Path to your backend resource definition
+
+const client = generateClient<Schema>()
 
 interface GameStore extends GameState {
-  initializeGame: (playerNames: string[]) => void;
-  drawCard: () => void;
-  playCard: (playerId: string, cardId: string, targetPlayerId?: string, selectedColor?: PropertyColor, targetPropertyId?: string) => void;
-  endTurn: () => void;
-  discardCard: (playerId: string, cardId: string) => void;
-  cardsPlayedThisTurn: number;
+  initializeGame: (playerNames: string[]) => void
+  drawCard: () => void
+  playCard: (
+    playerId: string,
+    cardId: string,
+    targetPlayerId?: string,
+    selectedColor?: PropertyColor,
+    targetPropertyId?: string
+  ) => void
+  endTurn: () => void
+  discardCard: (playerId: string, cardId: string) => void
+  cardsPlayedThisTurn: number
 }
 
-export const useGameStore = create<GameStore>((set, get) => ({
+export const useGameStore = create<GameStore>((set) => ({
   players: [],
   currentPlayer: 0,
   deck: [],
@@ -20,146 +30,186 @@ export const useGameStore = create<GameStore>((set, get) => ({
   actionInProgress: null,
   cardsPlayedThisTurn: 0,
 
-  initializeGame: (playerNames) => {
-    const deck = createDeck();
+  initializeGame: async (playerNames) => {
+    const deck = createDeck()
     const players = playerNames.map((name, index) => {
-      const playerHand = deck.splice(0, 5);
+      const playerHand = deck.splice(0, 5)
+
       return {
         id: `player-${index}`,
         name,
         hand: playerHand,
         properties: [],
         money: [],
-        bank: 0
-      };
-    });
+        bank: 0,
+      }
+    })
 
-    set({ 
-      players, 
-      deck, 
-      currentPlayer: 0, 
-      discardPile: [], 
+    const { data, errors } = await client.models.Game.create({
+      currentPlayerId: players[0].id,
+      deck: deck,
+      discardPile: [],
+      playerIds: players.map((p) => p.id),
       winner: null,
-      cardsPlayedThisTurn: 0 
-    });
+      status: "active",
+      id: "game-1",
+    })
+
+    if (errors) {
+      console.error("Error creating game", errors)
+      return
+    }
+    if (!data) {
+      console.error("No game data returned")
+      return
+    }
+    players.map(async (player) => {
+      await client.models.Player.create({
+        username: player.name,
+        hand: player.hand,
+        properties: player.properties,
+        money: 0,
+        bank: [],
+        id: player.id,
+        gamesPlayed: 0,
+        gamesWon: 0,
+        currentGameId: data?.id,
+      })
+    })
+    set({
+      players,
+      deck,
+      currentPlayer: 0,
+      discardPile: [],
+      winner: null,
+      cardsPlayedThisTurn: 0,
+    })
   },
 
   drawCard: () => {
-    set(state => {
-      if (state.cardsPlayedThisTurn > 0) return state;
+    set((state) => {
+      if (state.cardsPlayedThisTurn > 0) return state
 
-      let newDeck = [...state.deck];
+      let newDeck = [...state.deck]
       if (newDeck.length === 0) {
-        if (state.discardPile.length === 0) return state;
-        newDeck = [...state.discardPile].sort(() => Math.random() - 0.5);
-        set({ discardPile: [] });
+        if (state.discardPile.length === 0) return state
+        newDeck = [...state.discardPile].sort(() => Math.random() - 0.5)
+        set({ discardPile: [] })
       }
 
-      const drawnCards = newDeck.splice(0, 2);
-      if (drawnCards.length === 0) return state;
+      const drawnCards = newDeck.splice(0, 2)
+      if (drawnCards.length === 0) return state
 
-      const newPlayers = [...state.players];
-      const currentPlayer = newPlayers[state.currentPlayer];
-      if (!currentPlayer) return state;
+      const newPlayers = [...state.players]
+      const currentPlayer = newPlayers[state.currentPlayer]
+      if (!currentPlayer) return state
 
-      currentPlayer.hand = [...currentPlayer.hand, ...drawnCards];
+      currentPlayer.hand = [...currentPlayer.hand, ...drawnCards]
 
       return {
         ...state,
         deck: newDeck,
         players: newPlayers,
-        cardsPlayedThisTurn: state.cardsPlayedThisTurn + 1
-      };
-    });
+        cardsPlayedThisTurn: state.cardsPlayedThisTurn + 1,
+      }
+    })
   },
 
-  playCard: (playerId, cardId, targetPlayerId, selectedColor, targetPropertyId) => {
-    set(state => {
-      const playerIndex = state.players.findIndex(p => p.id === playerId);
-      if (playerIndex === -1) return state;
+  playCard: (
+    playerId,
+    cardId,
+    targetPlayerId,
+    selectedColor,
+    targetPropertyId
+  ) => {
+    set((state) => {
+      const playerIndex = state.players.findIndex((p) => p.id === playerId)
+      if (playerIndex === -1) return state
 
-      const player = state.players[playerIndex];
-      const cardIndex = player.hand.findIndex(c => c === cardId);
-      if (cardIndex === -1) return state;
+      const player = state.players[playerIndex]
+      const cardIndex = player.hand.findIndex((c) => c === cardId)
+      if (cardIndex === -1) return state
 
-      const card = getCardById(cardId);
-      if (!card) return state;
+      const card = getCardById(cardId)
+      if (!card) return state
 
-      const newPlayers = [...state.players];
-      const newHand = [...player.hand];
-      newHand.splice(cardIndex, 1);
+      const newPlayers = [...state.players]
+      const newHand = [...player.hand]
+      newHand.splice(cardIndex, 1)
 
       newPlayers[playerIndex] = {
         ...player,
-        hand: newHand
-      };
+        hand: newHand,
+      }
 
       // Handle different card types
-      if (card.type === 'property' && selectedColor) {
+      if (card.type === "property" && selectedColor) {
         // Initialize properties array if it doesn't exist
         if (!newPlayers[playerIndex].properties) {
-          newPlayers[playerIndex].properties = [];
+          newPlayers[playerIndex].properties = []
         }
 
-        const propertySetIndex = newPlayers[playerIndex].properties.findIndex(set => {
-          if (!set || set.length === 0) return false;
-          const firstCard = getCardById(set[0]);
-          return firstCard && firstCard.color === selectedColor;
-        });
+        const propertySetIndex = newPlayers[playerIndex].properties.findIndex(
+          (set) => {
+            if (!set || set.length === 0) return false
+            const firstCard = getCardById(set[0])
+            return firstCard && firstCard.color === selectedColor
+          }
+        )
 
         if (propertySetIndex !== -1) {
-          newPlayers[playerIndex].properties[propertySetIndex].push(cardId);
+          newPlayers[playerIndex].properties[propertySetIndex].push(cardId)
         } else {
-          newPlayers[playerIndex].properties.push([cardId]);
+          newPlayers[playerIndex].properties.push([cardId])
         }
-      } else if (card.type === 'money') {
-        newPlayers[playerIndex].bank += card.value;
-        newPlayers[playerIndex].money.push(cardId);
+      } else if (card.type === "money") {
+        newPlayers[playerIndex].bank += card.value
+        newPlayers[playerIndex].money.push(cardId)
       }
 
       return {
         ...state,
         players: newPlayers,
         cardsPlayedThisTurn: state.cardsPlayedThisTurn + 1,
-        discardPile: [...state.discardPile, cardId]
-      };
-    });
+        discardPile: [...state.discardPile, cardId],
+      }
+    })
   },
 
   discardCard: (playerId, cardId) => {
-    set(state => {
-      const playerIndex = state.players.findIndex(p => p.id === playerId);
-      if (playerIndex === -1) return state;
+    set((state) => {
+      const playerIndex = state.players.findIndex((p) => p.id === playerId)
+      if (playerIndex === -1) return state
 
-      const player = state.players[playerIndex];
-      const cardIndex = player.hand.findIndex(c => c === cardId);
-      if (cardIndex === -1) return state;
+      const player = state.players[playerIndex]
+      const cardIndex = player.hand.findIndex((c) => c === cardId)
+      if (cardIndex === -1) return state
 
-      const newPlayers = [...state.players];
-      const newHand = [...player.hand];
-      newHand.splice(cardIndex, 1);
+      const newPlayers = [...state.players]
+      const newHand = [...player.hand]
+      newHand.splice(cardIndex, 1)
 
       newPlayers[playerIndex] = {
         ...player,
-        hand: newHand
-      };
+        hand: newHand,
+      }
 
       return {
         ...state,
         players: newPlayers,
-        discardPile: [...state.discardPile, cardId]
-      };
-    });
+        discardPile: [...state.discardPile, cardId],
+      }
+    })
   },
 
   endTurn: () => {
-    set(state => {
-      const nextPlayer = (state.currentPlayer + 1) % state.players.length;
+    set((state) => {
+      const nextPlayer = (state.currentPlayer + 1) % state.players.length
       return {
         ...state,
         currentPlayer: nextPlayer,
-        cardsPlayedThisTurn: 0
-      };
-    });
-  }
-}));
+        cardsPlayedThisTurn: 0,
+      }
+    })
+  },
+}))

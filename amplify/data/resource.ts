@@ -5,11 +5,13 @@ const schema = a.schema({
     .model({
       id: a.string().required(),
       username: a.string().required(),
-      email: a.string().required(),
-      avatarUrl: a.string(),
-      gamesPlayed: a.integer(),
-      gamesWon: a.integer(),
-      currentGameId: a.string(),
+      hand: a.string().array().required(), // Array of card IDs
+      properties: a.string().array().required(), // Array of card IDs
+      bank: a.string().array().required(), // Array of card IDs
+      money: a.integer().required(),
+      gamesPlayed: a.integer().required(),
+      gamesWon: a.integer().required(),
+      currentGameId: a.string().required(),
     })
     .authorization((allow) => [allow.owner()]),
 
@@ -19,8 +21,6 @@ const schema = a.schema({
       status: a.enum(["waiting", "active", "completed", "initializing"]),
       currentPlayerId: a.string(),
       playerIds: a.string().array().required(),
-      createdAt: a.datetime().required(),
-      updatedAt: a.datetime().required(),
       winner: a.string(),
       discardPile: a.string().array().required(), // Array of card IDs
       deck: a.string().array().required(), // Array of card IDs
