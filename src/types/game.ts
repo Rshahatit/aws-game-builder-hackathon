@@ -50,6 +50,7 @@ interface BaseCard {
 export interface Property extends BaseCard {
   type: "property"
   color: PropertyColor
+  Icon: React.FC<React.SVGProps<SVGSVGElement>>
 }
 
 // Money Card

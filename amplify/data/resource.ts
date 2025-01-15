@@ -13,7 +13,7 @@ const schema = a.schema({
       gamesWon: a.integer().required(),
       currentGameId: a.string().required(),
     })
-    .authorization((allow) => [allow.owner()]),
+    .authorization((allow) => [allow.publicApiKey()]),
 
   Game: a
     .model({
@@ -56,7 +56,7 @@ export type Schema = ClientSchema<typeof schema>
 export const data = defineData({
   schema,
   authorizationModes: {
-    defaultAuthorizationMode: "userPool",
+    defaultAuthorizationMode: "apiKey",
     apiKeyAuthorizationMode: {
       expiresInDays: 30,
     },

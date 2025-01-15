@@ -7,6 +7,304 @@ import {
   PropertyColor,
 } from "../types/game"
 
+// Import AWS icons
+import S3Icon from "react-aws-icons/dist/aws/logo/S3"
+import GlacierIcon from "react-aws-icons/dist/aws/storage/GlacierVault"
+import RDSIcon from "react-aws-icons/dist/aws/logo/RDS"
+import DynamoDBIcon from "react-aws-icons/dist/aws/logo/DynamoDB"
+import EC2Icon from "react-aws-icons/dist/aws/logo/EC2"
+import ElasticBeanstalkIcon from "react-aws-icons/dist/aws/logo/ElasticBeanstalk"
+import LambdaIcon from "react-aws-icons/dist/aws/logo/Lambda"
+import ECSIcon from "react-aws-icons/dist/aws/logo/ECS"
+import IAMIcon from "react-aws-icons/dist/aws/logo/IAM"
+import CognitoIcon from "react-aws-icons/dist/aws/logo/Cognito"
+import ShieldIcon from "react-aws-icons/dist/aws/logo/Shield"
+import KinesisIcon from "react-aws-icons/dist/aws/logo/Kinesis"
+import EMRIcon from "react-aws-icons/dist/aws/logo/EMR"
+import RedshiftIcon from "react-aws-icons/dist/aws/logo/Redshift"
+import SageMakerIcon from "react-aws-icons/dist/aws/logo/MachineLearning"
+import RekognitionIcon from "react-aws-icons/dist/aws/logo/Rekognition"
+import VPCIcon from "react-aws-icons/dist/aws/logo/VPC"
+import Route53Icon from "react-aws-icons/dist/aws/logo/Route53"
+import CloudFrontIcon from "react-aws-icons/dist/aws/logo/CloudFront"
+import APIGatewayIcon from "react-aws-icons/dist/aws/logo/APIGateway"
+import CloudWatchIcon from "react-aws-icons/dist/aws/logo/CloudWatch"
+import CloudTrailIcon from "react-aws-icons/dist/aws/logo/CloudTrail"
+
+// Property Cards
+export const PROPERTIES: Record<string, Property> = {
+  // Brown Properties (Basic Storage) - Entry level storage services
+  s3_standard: {
+    id: "s3_standard",
+    type: "property",
+    name: "S3 Standard",
+    color: "brown",
+    value: 1,
+    count: 2,
+    Icon: S3Icon,
+  },
+  s3_glacier: {
+    id: "s3_glacier",
+    type: "property",
+    name: "S3 Glacier",
+    color: "brown",
+    value: 1,
+    count: 2,
+    Icon: GlacierIcon,
+  },
+
+  // Light Blue Properties (Database Services) - Basic data storage
+  rds_mysql: {
+    id: "rds_mysql",
+    type: "property",
+    name: "RDS MySQL",
+    color: "lightBlue",
+    value: 1,
+    count: 2,
+    Icon: RDSIcon,
+  },
+  aurora: {
+    id: "aurora",
+    type: "property",
+    name: "Aurora",
+    color: "lightBlue",
+    value: 1,
+    count: 2,
+    Icon: RDSIcon,
+  },
+  dynamodb: {
+    id: "dynamodb",
+    type: "property",
+    name: "DynamoDB",
+    color: "lightBlue",
+    value: 1,
+    count: 2,
+    Icon: DynamoDBIcon,
+  },
+
+  // Pink Properties (Compute Services) - Basic compute resources
+  ec2_instances: {
+    id: "ec2_instances",
+    type: "property",
+    name: "EC2 Instances",
+    color: "pink",
+    value: 2,
+    count: 2,
+    Icon: EC2Icon,
+  },
+  elastic_beanstalk: {
+    id: "elastic_beanstalk",
+    type: "property",
+    name: "Elastic Beanstalk",
+    color: "pink",
+    value: 2,
+    count: 2,
+    Icon: ElasticBeanstalkIcon,
+  },
+  lambda: {
+    id: "lambda",
+    type: "property",
+    name: "Lambda",
+    color: "pink",
+    value: 2,
+    count: 2,
+    Icon: LambdaIcon,
+  },
+
+  // Orange Properties (Container Services) - Container orchestration
+  ecs: {
+    id: "ecs",
+    type: "property",
+    name: "ECS",
+    color: "orange",
+    value: 2,
+    count: 2,
+    Icon: ECSIcon,
+  },
+  eks: {
+    id: "eks",
+    type: "property",
+    name: "EKS",
+    color: "orange",
+    value: 2,
+    count: 2,
+    Icon: ECSIcon, // Using ECS icon as EKS isn't available
+  },
+  fargate: {
+    id: "fargate",
+    type: "property",
+    name: "Fargate",
+    color: "orange",
+    value: 2,
+    count: 2,
+    Icon: ECSIcon, // Using ECS icon as Fargate isn't available
+  },
+
+  // Red Properties (Security Services) - Security and identity
+  iam: {
+    id: "iam",
+    type: "property",
+    name: "IAM",
+    color: "red",
+    value: 3,
+    count: 2,
+    Icon: IAMIcon,
+  },
+  cognito: {
+    id: "cognito",
+    type: "property",
+    name: "Cognito",
+    color: "red",
+    value: 3,
+    count: 2,
+    Icon: CognitoIcon,
+  },
+  shield: {
+    id: "shield",
+    type: "property",
+    name: "Shield",
+    color: "red",
+    value: 3,
+    count: 2,
+    Icon: ShieldIcon,
+  },
+
+  // Yellow Properties (Analytics Services) - Data processing
+  kinesis: {
+    id: "kinesis",
+    type: "property",
+    name: "Kinesis",
+    color: "yellow",
+    value: 3,
+    count: 2,
+    Icon: KinesisIcon,
+  },
+  emr: {
+    id: "emr",
+    type: "property",
+    name: "EMR",
+    color: "yellow",
+    value: 3,
+    count: 2,
+    Icon: EMRIcon,
+  },
+  redshift: {
+    id: "redshift",
+    type: "property",
+    name: "Redshift",
+    color: "yellow",
+    value: 3,
+    count: 2,
+    Icon: RedshiftIcon,
+  },
+
+  // Green Properties (AI/ML Services) - Machine learning
+  sagemaker: {
+    id: "sagemaker",
+    type: "property",
+    name: "SageMaker",
+    color: "green",
+    value: 4,
+    count: 2,
+    Icon: SageMakerIcon,
+  },
+  comprehend: {
+    id: "comprehend",
+    type: "property",
+    name: "Comprehend",
+    color: "green",
+    value: 4,
+    count: 2,
+    Icon: SageMakerIcon, // Using ML icon as Comprehend isn't available
+  },
+  rekognition: {
+    id: "rekognition",
+    type: "property",
+    name: "Rekognition",
+    color: "green",
+    value: 4,
+    count: 2,
+    Icon: RekognitionIcon,
+  },
+
+  // Blue Properties (Enterprise Services) - Premium enterprise services
+  outposts: {
+    id: "outposts",
+    type: "property",
+    name: "Outposts",
+    color: "blue",
+    value: 4,
+    count: 2,
+    Icon: EC2Icon, // Using EC2 icon as Outposts isn't available
+  },
+  wavelength: {
+    id: "wavelength",
+    type: "property",
+    name: "Wavelength",
+    color: "blue",
+    value: 4,
+    count: 2,
+    Icon: EC2Icon, // Using EC2 icon as Wavelength isn't available
+  },
+
+  // Railroad Properties (Networking Services) - Connection services
+  vpc: {
+    id: "vpc",
+    type: "property",
+    name: "VPC",
+    color: "railroad",
+    value: 2,
+    count: 1,
+    Icon: VPCIcon,
+  },
+  route53: {
+    id: "route53",
+    type: "property",
+    name: "Route 53",
+    color: "railroad",
+    value: 2,
+    count: 1,
+    Icon: Route53Icon,
+  },
+  cloudfront: {
+    id: "cloudfront",
+    type: "property",
+    name: "CloudFront",
+    color: "railroad",
+    value: 2,
+    count: 1,
+    Icon: CloudFrontIcon,
+  },
+  api_gateway: {
+    id: "api_gateway",
+    type: "property",
+    name: "API Gateway",
+    color: "railroad",
+    value: 2,
+    count: 1,
+    Icon: APIGatewayIcon,
+  },
+
+  // Utility Properties (Monitoring Services) - Essential monitoring tools
+  cloudwatch: {
+    id: "cloudwatch",
+    type: "property",
+    name: "CloudWatch",
+    color: "utility",
+    value: 2,
+    count: 1,
+    Icon: CloudWatchIcon,
+  },
+  cloudtrail: {
+    id: "cloudtrail",
+    type: "property",
+    name: "CloudTrail",
+    color: "utility",
+    value: 2,
+    count: 1,
+    Icon: CloudTrailIcon,
+  },
+}
 // Property Set Requirements
 export const PROPERTY_SETS = {
   brown: { name: "Brown", count: 2, rentValues: [1, 2, 3] },
@@ -35,253 +333,6 @@ export const PROPERTY_COLORS: Record<
   lightBlue: { name: "Light Blue", hex: "#87CEEB" },
   railroad: { name: "Railroad", hex: "#000000" },
   utility: { name: "Utility", hex: "#808080" },
-}
-
-// Property Cards
-export const PROPERTIES: Record<string, Property> = {
-  // Brown Properties (2 each)
-  mediterranean_avenue: {
-    id: "mediterranean_avenue",
-    type: "property",
-    name: "Mediterranean Avenue",
-    color: "brown",
-    value: 1,
-    count: 2,
-  },
-  baltic_avenue: {
-    id: "baltic_avenue",
-    type: "property",
-    name: "Baltic Avenue",
-    color: "brown",
-    value: 1,
-    count: 2,
-  },
-
-  // Light Blue Properties (3 each)
-  oriental_avenue: {
-    id: "oriental_avenue",
-    type: "property",
-    name: "Oriental Avenue",
-    color: "lightBlue",
-    value: 1,
-    count: 2,
-  },
-  vermont_avenue: {
-    id: "vermont_avenue",
-    type: "property",
-    name: "Vermont Avenue",
-    color: "lightBlue",
-    value: 1,
-    count: 2,
-  },
-  connecticut_avenue: {
-    id: "connecticut_avenue",
-    type: "property",
-    name: "Connecticut Avenue",
-    color: "lightBlue",
-    value: 1,
-    count: 2,
-  },
-
-  // Pink Properties (3 each)
-  st_charles_place: {
-    id: "st_charles_place",
-    type: "property",
-    name: "St. Charles Place",
-    color: "pink",
-    value: 2,
-    count: 2,
-  },
-  states_avenue: {
-    id: "states_avenue",
-    type: "property",
-    name: "States Avenue",
-    color: "pink",
-    value: 2,
-    count: 2,
-  },
-  virginia_avenue: {
-    id: "virginia_avenue",
-    type: "property",
-    name: "Virginia Avenue",
-    color: "pink",
-    value: 2,
-    count: 2,
-  },
-
-  // Orange Properties (3 each)
-  st_james_place: {
-    id: "st_james_place",
-    type: "property",
-    name: "St. James Place",
-    color: "orange",
-    value: 2,
-    count: 2,
-  },
-  tennessee_avenue: {
-    id: "tennessee_avenue",
-    type: "property",
-    name: "Tennessee Avenue",
-    color: "orange",
-    value: 2,
-    count: 2,
-  },
-  new_york_avenue: {
-    id: "new_york_avenue",
-    type: "property",
-    name: "New York Avenue",
-    color: "orange",
-    value: 2,
-    count: 2,
-  },
-
-  // Red Properties (3 each)
-  kentucky_avenue: {
-    id: "kentucky_avenue",
-    type: "property",
-    name: "Kentucky Avenue",
-    color: "red",
-    value: 3,
-    count: 2,
-  },
-  indiana_avenue: {
-    id: "indiana_avenue",
-    type: "property",
-    name: "Indiana Avenue",
-    color: "red",
-    value: 3,
-    count: 2,
-  },
-  illinois_avenue: {
-    id: "illinois_avenue",
-    type: "property",
-    name: "Illinois Avenue",
-    color: "red",
-    value: 3,
-    count: 2,
-  },
-
-  // Yellow Properties (3 each)
-  atlantic_avenue: {
-    id: "atlantic_avenue",
-    type: "property",
-    name: "Atlantic Avenue",
-    color: "yellow",
-    value: 3,
-    count: 2,
-  },
-  ventnor_avenue: {
-    id: "ventnor_avenue",
-    type: "property",
-    name: "Ventnor Avenue",
-    color: "yellow",
-    value: 3,
-    count: 2,
-  },
-  marvin_gardens: {
-    id: "marvin_gardens",
-    type: "property",
-    name: "Marvin Gardens",
-    color: "yellow",
-    value: 3,
-    count: 2,
-  },
-
-  // Green Properties (3 each)
-  pacific_avenue: {
-    id: "pacific_avenue",
-    type: "property",
-    name: "Pacific Avenue",
-    color: "green",
-    value: 4,
-    count: 2,
-  },
-  north_carolina_avenue: {
-    id: "north_carolina_avenue",
-    type: "property",
-    name: "North Carolina Avenue",
-    color: "green",
-    value: 4,
-    count: 2,
-  },
-  pennsylvania_avenue: {
-    id: "pennsylvania_avenue",
-    type: "property",
-    name: "Pennsylvania Avenue",
-    color: "green",
-    value: 4,
-    count: 2,
-  },
-
-  // Blue Properties (2 each)
-  park_place: {
-    id: "park_place",
-    type: "property",
-    name: "Park Place",
-    color: "blue",
-    value: 4,
-    count: 2,
-  },
-  boardwalk: {
-    id: "boardwalk",
-    type: "property",
-    name: "Boardwalk",
-    color: "blue",
-    value: 4,
-    count: 2,
-  },
-
-  // Railroad Properties (4 total)
-  reading_railroad: {
-    id: "reading_railroad",
-    type: "property",
-    name: "Reading Railroad",
-    color: "railroad",
-    value: 2,
-    count: 1,
-  },
-  pennsylvania_railroad: {
-    id: "pennsylvania_railroad",
-    type: "property",
-    name: "Pennsylvania Railroad",
-    color: "railroad",
-    value: 2,
-    count: 1,
-  },
-  b_and_o_railroad: {
-    id: "b_and_o_railroad",
-    type: "property",
-    name: "B. & O. Railroad",
-    color: "railroad",
-    value: 2,
-    count: 1,
-  },
-  short_line: {
-    id: "short_line",
-    type: "property",
-    name: "Short Line",
-    color: "railroad",
-    value: 2,
-    count: 1,
-  },
-
-  // Utility Properties (2 total)
-  electric_company: {
-    id: "electric_company",
-    type: "property",
-    name: "Electric Company",
-    color: "utility",
-    value: 2,
-    count: 1,
-  },
-  water_works: {
-    id: "water_works",
-    type: "property",
-    name: "Water Works",
-    color: "utility",
-    value: 2,
-    count: 1,
-  },
 }
 
 // Money Cards
@@ -593,3 +644,249 @@ export const cardDefinitions = {
   isSetComplete,
   calculateRent,
 }
+// // Property Cards
+// export const PROPERTIES: Record<string, Property> = {
+//   // Brown Properties (2 each)
+//   mediterranean_avenue: {
+//     id: "mediterranean_avenue",
+//     type: "property",
+//     name: "Mediterranean Avenue",
+//     color: "brown",
+//     value: 1,
+//     count: 2,
+//   },
+//   baltic_avenue: {
+//     id: "baltic_avenue",
+//     type: "property",
+//     name: "Baltic Avenue",
+//     color: "brown",
+//     value: 1,
+//     count: 2,
+//   },
+
+//   // Light Blue Properties (3 each)
+//   oriental_avenue: {
+//     id: "oriental_avenue",
+//     type: "property",
+//     name: "Oriental Avenue",
+//     color: "lightBlue",
+//     value: 1,
+//     count: 2,
+//   },
+//   vermont_avenue: {
+//     id: "vermont_avenue",
+//     type: "property",
+//     name: "Vermont Avenue",
+//     color: "lightBlue",
+//     value: 1,
+//     count: 2,
+//   },
+//   connecticut_avenue: {
+//     id: "connecticut_avenue",
+//     type: "property",
+//     name: "Connecticut Avenue",
+//     color: "lightBlue",
+//     value: 1,
+//     count: 2,
+//   },
+
+//   // Pink Properties (3 each)
+//   st_charles_place: {
+//     id: "st_charles_place",
+//     type: "property",
+//     name: "St. Charles Place",
+//     color: "pink",
+//     value: 2,
+//     count: 2,
+//   },
+//   states_avenue: {
+//     id: "states_avenue",
+//     type: "property",
+//     name: "States Avenue",
+//     color: "pink",
+//     value: 2,
+//     count: 2,
+//   },
+//   virginia_avenue: {
+//     id: "virginia_avenue",
+//     type: "property",
+//     name: "Virginia Avenue",
+//     color: "pink",
+//     value: 2,
+//     count: 2,
+//   },
+
+//   // Orange Properties (3 each)
+//   st_james_place: {
+//     id: "st_james_place",
+//     type: "property",
+//     name: "St. James Place",
+//     color: "orange",
+//     value: 2,
+//     count: 2,
+//   },
+//   tennessee_avenue: {
+//     id: "tennessee_avenue",
+//     type: "property",
+//     name: "Tennessee Avenue",
+//     color: "orange",
+//     value: 2,
+//     count: 2,
+//   },
+//   new_york_avenue: {
+//     id: "new_york_avenue",
+//     type: "property",
+//     name: "New York Avenue",
+//     color: "orange",
+//     value: 2,
+//     count: 2,
+//   },
+
+//   // Red Properties (3 each)
+//   kentucky_avenue: {
+//     id: "kentucky_avenue",
+//     type: "property",
+//     name: "Kentucky Avenue",
+//     color: "red",
+//     value: 3,
+//     count: 2,
+//   },
+//   indiana_avenue: {
+//     id: "indiana_avenue",
+//     type: "property",
+//     name: "Indiana Avenue",
+//     color: "red",
+//     value: 3,
+//     count: 2,
+//   },
+//   illinois_avenue: {
+//     id: "illinois_avenue",
+//     type: "property",
+//     name: "Illinois Avenue",
+//     color: "red",
+//     value: 3,
+//     count: 2,
+//   },
+
+//   // Yellow Properties (3 each)
+//   atlantic_avenue: {
+//     id: "atlantic_avenue",
+//     type: "property",
+//     name: "Atlantic Avenue",
+//     color: "yellow",
+//     value: 3,
+//     count: 2,
+//   },
+//   ventnor_avenue: {
+//     id: "ventnor_avenue",
+//     type: "property",
+//     name: "Ventnor Avenue",
+//     color: "yellow",
+//     value: 3,
+//     count: 2,
+//   },
+//   marvin_gardens: {
+//     id: "marvin_gardens",
+//     type: "property",
+//     name: "Marvin Gardens",
+//     color: "yellow",
+//     value: 3,
+//     count: 2,
+//   },
+
+//   // Green Properties (3 each)
+//   pacific_avenue: {
+//     id: "pacific_avenue",
+//     type: "property",
+//     name: "Pacific Avenue",
+//     color: "green",
+//     value: 4,
+//     count: 2,
+//   },
+//   north_carolina_avenue: {
+//     id: "north_carolina_avenue",
+//     type: "property",
+//     name: "North Carolina Avenue",
+//     color: "green",
+//     value: 4,
+//     count: 2,
+//   },
+//   pennsylvania_avenue: {
+//     id: "pennsylvania_avenue",
+//     type: "property",
+//     name: "Pennsylvania Avenue",
+//     color: "green",
+//     value: 4,
+//     count: 2,
+//   },
+
+//   // Blue Properties (2 each)
+//   park_place: {
+//     id: "park_place",
+//     type: "property",
+//     name: "Park Place",
+//     color: "blue",
+//     value: 4,
+//     count: 2,
+//   },
+//   boardwalk: {
+//     id: "boardwalk",
+//     type: "property",
+//     name: "Boardwalk",
+//     color: "blue",
+//     value: 4,
+//     count: 2,
+//   },
+
+//   // Railroad Properties (4 total)
+//   reading_railroad: {
+//     id: "reading_railroad",
+//     type: "property",
+//     name: "Reading Railroad",
+//     color: "railroad",
+//     value: 2,
+//     count: 1,
+//   },
+//   pennsylvania_railroad: {
+//     id: "pennsylvania_railroad",
+//     type: "property",
+//     name: "Pennsylvania Railroad",
+//     color: "railroad",
+//     value: 2,
+//     count: 1,
+//   },
+//   b_and_o_railroad: {
+//     id: "b_and_o_railroad",
+//     type: "property",
+//     name: "B. & O. Railroad",
+//     color: "railroad",
+//     value: 2,
+//     count: 1,
+//   },
+//   short_line: {
+//     id: "short_line",
+//     type: "property",
+//     name: "Short Line",
+//     color: "railroad",
+//     value: 2,
+//     count: 1,
+//   },
+
+//   // Utility Properties (2 total)
+//   electric_company: {
+//     id: "electric_company",
+//     type: "property",
+//     name: "Electric Company",
+//     color: "utility",
+//     value: 2,
+//     count: 1,
+//   },
+//   water_works: {
+//     id: "water_works",
+//     type: "property",
+//     name: "Water Works",
+//     color: "utility",
+//     value: 2,
+//     count: 1,
+//   },
+// }
