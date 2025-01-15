@@ -4,7 +4,6 @@ import { useNavigate } from "react-router-dom"
 import { Users, UserPlus, ArrowLeft } from "lucide-react"
 import { useGameStore } from "../store/gameStore"
 
-
 export const Lobby = () => {
   const navigate = useNavigate()
   const [players, setPlayers] = useState<string[]>([""])
@@ -22,10 +21,10 @@ export const Lobby = () => {
     setPlayers(newPlayers)
   }
 
-  const startGame = () => {
+  const startGame = async () => {
     const validPlayers = players.filter((name) => name.trim() !== "")
     if (validPlayers.length >= 2) {
-      initializeGame(validPlayers)
+      await initializeGame(validPlayers)
       navigate("/game")
     }
   }
